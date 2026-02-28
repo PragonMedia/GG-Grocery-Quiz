@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en_US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Savers</title>
+    <link rel="icon" href="./images/new-logo.png" type="image/png" />
+    <link rel="shortcut icon" href="./images/new-logo.png" type="image/png" />
+
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=AW-16921817895"
+    ></script>
+
+    <script>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", "GTM-MC55FSL5");
+    </script>
+    <!-- End Google Tag Manager -->
+
+    <script>
+      function trackGTG(e) {
+        e.preventDefault();
+
+        const phoneLink = document.getElementById("phone-number").href;
+        const currentSearch = window.location.search || "";
+
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({ event: "gtg_clicked" });
+
+        try {
+          if (typeof fbq === "function") {
+            fbq("track", "Lead");
+          }
+        } catch (e) {}
+
+        const gtgValue = localStorage.getItem("gtg");
+        const qualifiedParam = new URL(window.location.href).searchParams.get("qualified");
+        if ((gtgValue === null || gtgValue === undefined || gtgValue === "") && qualifiedParam === "yes") {
+          setTimeout(function () {
+            window.location.href = "https://policyfinds.com/" + (currentSearch ? currentSearch : "");
+          }, 7000);
+        }
+
+        setTimeout(() => {
+          window.location.href = phoneLink;
+        }, 150);
+      }
+    </script>
+
+    <script>
+      (function () {
+        try {
+          const originalUrl = new URL(window.location.href);
+          const originalParams = {};
+          originalUrl.searchParams.forEach((value, key) => {
+            originalParams[key] = value;
+          });
+          sessionStorage.setItem(
+            "original_url_params",
+            JSON.stringify(originalParams)
+          );
+
+          if (Object.keys(originalParams).length > 0) {
+            console.log("Original URL parameters captured:", originalParams);
+          } else {
+            console.log("No URL parameters found on initial load");
+          }
+        } catch (e) {
+          console.error("Error capturing original URL parameters:", e);
+        }
+      })();
+    </script>
+
+    <script>
+      (async () => {
+        function pushParams(params) {
+          const storedParams = sessionStorage.getItem("original_url_params");
+          let u;
+
+          if (storedParams) {
+            try {
+              const originalParams = JSON.parse(storedParams);
+              u = new URL(window.location.origin + window.location.pathname);
+
+              for (const [k, v] of Object.entries(originalParams)) {
+                if (!params.hasOwnProperty(k) && v != null && v !== "") {
+                  u.searchParams.set(k, v);
+                }
+              }
+            } catch (e) {
+              console.error("Error restoring original params:", e);
+              u = new URL(location.href);
+            }
+          } else {
+            u = new URL(location.href);
+          }
+
+          for (const [k, v] of Object.entries(params)) {
+            if (v != null && v !== "") u.searchParams.set(k, v);
+          }
+
+          const newUrl = u.toString();
+          if (newUrl !== location.href) {
+            history.replaceState({}, "", newUrl);
+          }
+        }
+
+        const clickReq = fetch("./clickid.php", {
+          method: "POST",
+          credentials: "include",
+        })
+          .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+          .catch(() => null);
+
+        const clickRes = await clickReq;
+
+        const updates = {};
+
+        if (clickRes && clickRes.debug && clickRes.debug.rtkID) {
+          console.log("rtkID from API:", clickRes.debug.rtkID);
+        }
+
+        if (clickRes && clickRes.ok && clickRes.clickid) {
+          localStorage.setItem("rt_clickid", clickRes.clickid);
+          updates.clickid = clickRes.clickid;
+        } else {
+          const u = new URL(location.href);
+          const fromUrl = u.searchParams.get("clickid");
+          const fromLS = localStorage.getItem("rt_clickid");
+          if (fromUrl && !fromLS) localStorage.setItem("rt_clickid", fromUrl);
+          if (!fromUrl && fromLS) updates.clickid = fromLS;
+        }
+
+        if (Object.keys(updates).length) pushParams(updates);
+      })();
+
+      (async () => {
+        try {
+          const gtgReq = fetch("./gtg.php?" + window.location.search, {
+            method: "GET",
+            credentials: "include",
+          })
+            .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+            .catch(() => null);
+
+          const gtgRes = await gtgReq;
+
+          if (gtgRes && gtgRes.success) {
+            if (gtgRes.gtg !== null) {
+              localStorage.setItem("gtg", gtgRes.gtg);
+            } else {
+              localStorage.removeItem("gtg");
+            }
+          } else {
+          }
+        } catch (error) {
+          console.error("GTG fetch error:", error);
+        }
+      })();
+
+      window.phoneNumberData = null;
+
+      function updatePhoneNumberInDOM(phoneNumber, formattedNumber) {
+        const digits = String(phoneNumber).replace(/\D/g, "");
+        const phoneElement = document.getElementById("phone-number");
+        if (phoneElement && digits.length >= 10) {
+          phoneElement.href = "tel:+" + digits;
+        }
+        const phoneTextElement = document.getElementById("phone_retreaver");
+        if (phoneTextElement && formattedNumber) {
+          phoneTextElement.textContent = formattedNumber;
+        }
+      }
+
+      window.updatePhoneNumberInDOM = updatePhoneNumberInDOM;
+    </script>
+
+    <link rel="stylesheet" href="./css/app.css" />
+
+    <style>
+      /* Sticky footer layout */
+      html {
+        min-height: 100%;
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        min-height: 100%;
+      }
+      main {
+        flex: 1 0 auto;
+      }
+      .footer {
+        position: relative;
+        flex-shrink: 0;
+        margin-top: auto;
+        border-top: 1px solid black;
+        background-color: #f5f5f5;
+        width: 100%;
+        padding: 2.5rem 0;
+      }
+      @media (min-width: 1024px) {
+        .footer {
+          padding: 5rem 0;
+        }
+      }
+      @media (max-width: 640px) {
+        .footer {
+          overflow-x: hidden;
+        }
+        main {
+          padding-bottom: 2rem;
+        }
+      }
+      /* Form container - max-w-2xl + px-4, text center */
+      .form-container {
+        max-width: 42rem;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 1.5rem 1rem 6rem;
+        text-align: center;
+      }
+      @media (min-width: 640px) {
+        .form-container {
+          padding: 1.25rem 1rem 6rem;
+        }
+      }
+
+      /* Form step UI */
+      .form-header-bar {
+        background-color: #d1d5dc;
+        padding: 24px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .form-header-bar .form-header-logo {
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        object-fit: contain;
+      }
+      .form-header-bar #domain-name {
+        font-size: clamp(14px, 4vw, 24px);
+        font-weight: 700;
+      }
+      .form-main-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #374151;
+        text-align: center;
+        padding: 32px 16px 32px;
+        max-width: 48rem;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.2;
+      }
+      @media (min-width: 640px) {
+        .form-main-title {
+          font-size: 36px;
+          line-height: 1.3;
+        }
+      }
+      .form-divider {
+        height: 1px;
+        background: #6b7280;
+        width: 100%;
+      }
+      .form-progress-row {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 16px 0 8px;
+      }
+      .form-progress-text {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #6b7280;
+        white-space: nowrap;
+      }
+      .form-progress-bar {
+        width: 100%;
+        height: 12px;
+        background: #e5e7eb;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .form-progress-fill {
+        height: 100%;
+        background: #1e8ff4;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+      .form-instruction {
+        font-size: 20px;
+        color: #6b7280;
+        padding: 8px 0 8px;
+      }
+      @media (min-width: 640px) {
+        .form-instruction {
+          padding: 16px 0 8px;
+        }
+      }
+      .form-question {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #374151;
+        padding: 16px 0 20px;
+      }
+      .form-buttons {
+        padding: 0 0 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .form-btn {
+        width: 100%;
+        padding: 20px 24px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        background: #0072c0;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: background 0.2s, transform 0.2s;
+      }
+      .form-btn:hover {
+        background: #ff0000;
+        color: #fff;
+        transform: scale(1.05);
+      }
+      .form-step {
+        display: none;
+      }
+      .form-step.active {
+        display: block;
+      }
+      .form-result-card {
+        margin: 16px;
+        padding: 24px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        text-align: center;
+      }
+      .form-result-success {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #16a34a;
+        margin-bottom: 12px;
+      }
+      .form-result-instruction {
+        font-size: 1.25rem;
+        color: #6b7280;
+        margin-bottom: 24px;
+      }
+      .form-result-cta {
+        display: block;
+        width: 100%;
+        padding: 22px 24px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        background: #0072c0 !important;
+        border: none;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.2s;
+      }
+      .form-result-cta:hover {
+        background: #ff0000 !important;
+        color: #fff;
+        transform: scale(1.05);
+      }
+      #claim-now-container,
+      #claim-now-iframe,
+      .claim-now-wrapper {
+        overflow: hidden !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript
+      ><iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-MC55FSL5"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe
+    ></noscript>
+
+    <main>
+      <!-- Header bar - full width -->
+      <div class="form-header-bar">
+        <img src="./images/company_logo.png" alt="Company logo" class="form-header-logo" />
+        <span id="domain-name" class="form-progress-text"></span>
+      </div>
+
+      <!-- Main title (persistent) - full width -->
+      <h1 class="form-main-title">
+        Check If You Pre-Qualify For A Medicare Advantage Healthy Allowance
+      </h1>
+
+      <!-- Divider - full width -->
+      <div class="form-divider"></div>
+
+      <div class="form-container">
+      <!-- Step 1: Age -->
+      <div id="form-step-1" class="form-step active">
+        <p class="form-instruction">Answer the question below to get started!</p>
+        <div class="form-progress-row">
+          <span class="form-progress-text">Question 1/2</span>
+          <div class="form-progress-bar">
+            <div class="form-progress-fill" id="progress-fill-1" style="width: 0%"></div>
+          </div>
+        </div>
+        <p class="form-question">What is your age?</p>
+        <div class="form-buttons">
+          <button type="button" class="form-btn form-step-btn" data-form-step="1" data-form-value="below 65">UNDER 65</button>
+          <button type="button" class="form-btn form-step-btn" data-form-step="1" data-form-value="65 - 70">65 TO 70</button>
+          <button type="button" class="form-btn form-step-btn" data-form-step="1" data-form-value="71 - 75">71 TO 75</button>
+          <button type="button" class="form-btn form-step-btn" data-form-step="1" data-form-value="76 and older">OVER 75</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Medicare -->
+      <div id="form-step-2" class="form-step">
+        <p class="form-instruction">Answer the question below to get started!</p>
+        <div class="form-progress-row">
+          <span class="form-progress-text">Question 2/2</span>
+          <div class="form-progress-bar">
+            <div class="form-progress-fill" id="progress-fill-2" style="width: 50%"></div>
+          </div>
+        </div>
+        <p class="form-question">Are you on Medicare Parts A &amp; B?</p>
+        <div class="form-buttons">
+          <button type="button" class="form-btn form-step-btn" data-form-step="2" data-form-value="Yes">YES</button>
+          <button type="button" class="form-btn form-step-btn" data-form-step="2" data-form-value="No">NO</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Result -->
+      <div id="form-step-3" class="form-step">
+        <div class="form-progress-row">
+          <span class="form-progress-text">Complete</span>
+          <div class="form-progress-bar">
+            <div class="form-progress-fill" id="progress-fill-3" style="width: 100%"></div>
+          </div>
+        </div>
+        <div class="form-result-card">
+          <p class="form-result-success">Great News, You May Be Eligible!</p>
+          <p class="form-result-instruction">Speak with a licensed insurance agent to find out if you qualify.</p>
+          <!-- Phone CTA (qualified) -->
+          <a
+            id="phone-number"
+            href="tel:+18887062564"
+            onclick="trackGTG(event)"
+            class="form-result-cta phone-cta"
+            style="display: none"
+          >
+            <span id="phone_retreaver">+1 (866) 498-2822</span>
+          </a>
+          <!-- CLAIM NOW contact (non-qualified, gtg=1) -->
+          <a
+            id="claim-now-contact-button"
+            href="/contact"
+            onclick="fbq('track', 'Lead');"
+            class="form-result-cta claim-contact-cta"
+            style="display: none"
+          >
+            CLAIM NOW
+          </a>
+          <!-- CLAIM NOW iframe (non-qualified, gtg!=1) -->
+          <div id="claim-now-wrapper" class="claim-now-wrapper" style="display: none">
+            <iframe
+              id="claim-now-iframe"
+              src=""
+              scrolling="no"
+              style="width: 100%; height: 80px; border: none; display: block"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div
+        class="mx-auto max-w-7xl px-4 text-sm sm:text-md leading-5 sm:leading-6 text-gray-500"
+      >
+        <p style="text-align: center">
+          This site is not a part of the Google website or Google LLC.
+          Additionally, this site is NOT endorsed by Google in any way. 'Google'
+          is a trademark of Google LLC.
+        </p>
+        <p style="text-align: center; margin-top: 15px">
+          *This website is not affiliated with or endorsed by any government
+          agency. Our mission is to help you make confident, informed choices
+          about your Medicare Advantage plan options. We are an independent
+          educational resource and are not a government agency, nor are we
+          affiliated with or endorsed by the U.S. government or the federal
+          Medicare program. We do not issue or facilitate official government
+          documents or services. Instead, we connect you with licensed insurance
+          agents who can review plan options available in your area. For
+          official Medicare information, please visit the Centers for Medicare &
+          Medicaid Services (CMS).
+        </p>
+        <div
+          class="mx-auto max-w-7xl px-4 text-sm sm:text-md leading-5 sm:leading-6 text-gray-500"
+          style="
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            padding-top: 15px;
+          "
+        >
+          <p>@2026. All rights Reserved.</p>
+          <p class="text-center text-blue-400">
+            <span>
+              <a href="/privacy" target="_blank">Privacy Policy</a> |
+              <a href="/terms" target="_blank">Terms &amp; Conditions</a> |
+              <a href="/contact" target="_blank">Contact Us</a>
+            </span>
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./js/jquery-3.7.1.min.js"></script>
+    <script src="./js/app.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        if (window.phoneNumberData) {
+          updatePhoneNumberInDOM(
+            window.phoneNumberData.phone_number,
+            window.phoneNumberData.formatted_number
+          );
+        } else {
+          try {
+            await window.phoneNumberPromise;
+            if (window.phoneNumberData) {
+              updatePhoneNumberInDOM(
+                window.phoneNumberData.phone_number,
+                window.phoneNumberData.formatted_number
+              );
+            }
+          } catch (error) {
+            console.error("Error in backup phone number update:", error);
+          }
+        }
+      });
+    </script>
+
+    <script>
+      (function () {
+        let domainName = window.location.hostname;
+        domainName = domainName.replace(/^www\./, "");
+        domainName = domainName.toUpperCase();
+        const domainElement = document.getElementById("domain-name");
+        if (domainElement) {
+          domainElement.textContent = domainName;
+        }
+      })();
+    </script>
+  </body>
+</html>
